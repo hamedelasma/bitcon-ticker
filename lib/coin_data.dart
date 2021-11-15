@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'networking.dart';
 
 const List<String> currenciesList = [
   'AUD',
@@ -32,17 +31,18 @@ const List<String> cryptoList = [
 ];
 
 class CoinData {
-  CoinData(this.url);
+  late String selectedCurrency;
+  late String selectedCrypto;
+  final String apikey = '0EB942FF-9EF8-49C5-B2DC-04E7711EA017';
+  final String apiUrl = 'https://rest.coinapi.io/v1/exchangerate/';
 
-  final String url;
+  CoinData({required this.selectedCurrency, required this.selectedCrypto});
 
-  Future getData() async {
-    http.Response response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      String data = response.body;
-      return jsonDecode(data);
-    } else {
-      print(response.statusCode);
-    }
+  getPrice() async {
+    NetworkHelper networkHelper = NetworkHelper(
+        '$apiUrl$selectedCrypto/$selectedCurrency?apikey=$apikey');
+    var priceData = await networkHelper.getData();
+    return priceData;
   }
 }
+//https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=0EB942FF-9EF8-49C5-B2DC-04E7711EA017

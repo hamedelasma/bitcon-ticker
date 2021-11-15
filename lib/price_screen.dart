@@ -14,7 +14,7 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   late String selectedCurrency = 'USD';
-
+  late String selectedCrypto = 'BTC' ;
   DropdownButton<String> androidDropdownButton() {
     List<DropdownMenuItem<String>> dropdownItems = [];
     for (int i = 0; i < currenciesList.length; i++) {
@@ -48,6 +48,17 @@ class _PriceScreenState extends State<PriceScreen> {
       },
       children: pickerItems,
     );
+  }
+
+  void getData() async {
+     var crypto = await CoinData(selectedCurrency: selectedCurrency , selectedCrypto: selectedCrypto).getPrice();
+     print(crypto['asset_id_base']);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
   }
 
   @override
