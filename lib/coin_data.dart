@@ -28,6 +28,23 @@ const List<String> cryptoList = [
   'BTC',
   'ETH',
   'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
+  'LTC',
 ];
 
 class CoinData {
