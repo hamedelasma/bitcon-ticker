@@ -14,7 +14,7 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   late String selectedCurrency = 'USD';
-  late String selectedCurrencyPrice = '?';
+  late List prices = [0, 0, 0];
 
   DropdownButton<String> androidDropdownButton() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -29,11 +29,11 @@ class _PriceScreenState extends State<PriceScreen> {
     return DropdownButton<String>(
       value: selectedCurrency,
       items: dropdownItems,
-      onChanged: (value) {
+      onChanged: (value) async {
         setState(() {
           selectedCurrency = value!;
-          getData(value);
         });
+        await getData();
       },
     );
   }
@@ -52,38 +52,23 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  Future<String> getData(selectedCrypto) async {
-    var crypto = await CoinData(
-            selectedCurrency: selectedCurrency, selectedCrypto: selectedCrypto)
-        .getPrice();
-    return crypto['rate'].toString().substring(0, 8);
-  }
-
-  Card cardWidget(cryptoCoin) {
-    return Card(
-      color: Colors.lightBlueAccent,
-      elevation: 5.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-        child: Text(
-          '1 $cryptoCoin = $selectedCurrencyPrice $selectedCurrency',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20.0,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
+  Future<void> getData() async {
+    for (int i = 0; i < cryptoList.length; i++) {
+      var crypto = await CoinData(
+              selectedCurrency: selectedCurrency, selectedCrypto: cryptoList[i])
+          .getPrice();
+      setState(() {
+        prices[i] = crypto['rate'].toString().substring(0, 8);
+      });
+      print(prices[i]);
+    }
+    return;
   }
 
   @override
   void initState() {
     super.initState();
-    // getData(BTCCrypto);
+    getData();
   }
 
   @override
@@ -102,27 +87,43 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Column(
                 children: [
                   ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
+                      physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: cryptoList.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return cardWidget(cryptoList[index]);
-                      })
-                  // cardWidget(cryptoList[0]),
-                  // cardWidget(cryptoList[1]),
-                  // cardWidget(cryptoList[2]),
+                        // return cardWidget(cryptoList[index]);
+                        return Card(
+                          color: Colors.lightBlueAccent,
+                          elevation: 5.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 15.0, horizontal: 28.0),
+                            child: Text(
+                              '1 ${cryptoList[index]} = ${prices[index]} $selectedCurrency',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
                 ],
               ),
             ),
-            Container(
-                height: 150.0,
-                alignment: Alignment.center,
-                padding: EdgeInsets.only(bottom: 30.0),
-                color: Colors.lightBlue,
-                child: Platform.isIOS ? iOSPicker() : androidDropdownButton()),
           ],
         ),
       ),
+      bottomNavigationBar: Container(
+          height: 150.0,
+          alignment: Alignment.center,
+          padding: EdgeInsets.only(bottom: 30.0),
+          color: Colors.lightBlue,
+          child: Platform.isIOS ? iOSPicker() : androidDropdownButton()),
     );
   }
 }
